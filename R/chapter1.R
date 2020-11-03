@@ -1,6 +1,7 @@
 #' Uniform Random Numbers
 #'
 #' This function is just a trivial wrapper for `runif`.
+#' @export
 RandomNumbers <- function(n) {
   return(runif(n = n))
 }
@@ -13,6 +14,7 @@ RandomNumbers <- function(n) {
 #' The R way to do this is:
 #' `sample(c("H", "T"), n, replace = TRUE,`
 #' ` prob = c(prob_heads, 1 - prob_heads))`.
+#' @export
 CoinTosses <- function(n, prob_heads = 0.5) {
   sample_space <- c("H", "T")
   rn <- RandomNumbers(n)
@@ -23,6 +25,7 @@ CoinTosses <- function(n, prob_heads = 0.5) {
 #' Summarize Coin Tosses
 #'
 #' Generate a named vector of summary statistics of a coin toss vector (above).
+#' @export
 SummarizeCoinTosses <- function(coin_tosses) {
   c(n = length(coin_tosses),
        n_heads = sum(coin_tosses == "H"),
@@ -34,6 +37,7 @@ SummarizeCoinTosses <- function(coin_tosses) {
 #' Uses `RandomNumbers` directly to generate `n` six-sided die rolls.
 #' The R way to do this is:
 #' `sample(1:6, n, replace = TRUE)`
+#' @export
 DieRolls <- function(n) {
   rn <- RandomNumbers(n)
   return(floor(6 * rn) + 1) ## Formula on pg. 3
@@ -42,6 +46,7 @@ DieRolls <- function(n) {
 #' DeMere Simulation One
 #'
 #' Implements the simulation of DeMere's first wager, q.v.
+#' @export
 DeMere1 <- function(m) {
   die_roll_matrix <- matrix(nrow = m, ncol = 4,
                            data = DieRolls(m * 4))
@@ -53,6 +58,7 @@ DeMere1 <- function(m) {
 #' DeMere Simulation Two
 #'
 #' Implements the simulation of DeMere's second wager, q.v.
+#' @export
 DeMere2 <- function(m, n = 24) {
   first_die_roll_matrix <- matrix(nrow = m, ncol = n,
                                   data = DieRolls(m * n))
@@ -74,6 +80,8 @@ DeMere2 <- function(m, n = 24) {
 #' Returns a `tibble` with two columns each of length `m`:
 #'  winnings: the total winnings at the end of the `n`th round.
 #'  ahead: the total number of rounds during which the player was ahead.
+#' @export
+#' @importFrom matrixStats rowCumsums
 HTSimulation <- function(m, n, prob_heads = 0.5) {
   outcomes <- matrix(nrow = m, ncol = n,
                      data = ifelse(CoinTosses(m * n, prob_heads) == "H",
@@ -95,6 +103,9 @@ HTSimulation <- function(m, n, prob_heads = 0.5) {
 #'
 #' Instead of SpikeGraph, visualize the outcome of `HTSimulation`
 #'  by using a hexplot. This requires a fairly large `m`.
+#' @export
+#' @importFrom dplyr `%>%` mutate
+#' @importFrom ggplot2 ggplot geom_hex
 HTSimulationHex <- function(hts) {
   maxahead <- 2 * ceiling(max(hts$ahead) / 2)
   hts %>% mutate(winnings =
@@ -112,6 +123,10 @@ HTSimulationHex <- function(hts) {
 #'
 #' Instead of SpikeGraph, visualize the outcome of `HTSimulation`
 #'  by using two marginal histograms, one for each column.
+#' @export
+#' @importFrom ggplot2 ggplot geom_histogram facet_grid xlab
+#' @importFrom tidyr pivot_longer
+#' @importFrom dplyr `%>%`
 HTSimulationHist <- function(hts) {
   hts %>% pivot_longer(everything()) %>%
     ggplot(aes(x=value)) +
@@ -121,6 +136,7 @@ HTSimulationHist <- function(hts) {
 }
 
 #' SpikeGraph, Not Implemented
+#' @export
 SpikeGraph <- function(...) {
   stop(paste("SpikeGraph is not implemented. For HTSimulation, try",
              "HTSimulationHex(htsim) or HTSimulationHist(htsim)."))
@@ -130,6 +146,8 @@ SpikeGraph <- function(...) {
 #'
 #' Simulate and plot `m` trajectories of the coin toss game.
 #' NOTE: this is run on its own, without input from `HTSimulation`.
+#' @export
+#' @importFrom matrixStats rowCumsums
 HTSimulationTrace <- function(m, n, prob_heads = 0.5) {
   winnings <- rowCumsums(matrix(nrow = m, ncol = n,
                                 data = ifelse(CoinTosses(m * n, prob_heads) == "H", 1L, -1L)))
