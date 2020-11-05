@@ -12,7 +12,7 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-Imports:
+Depends:
     matrixStats (>= 0.57.0),
     dplyr (>= 1.0.2),
     ggplot2 (>= 3.3.2)
